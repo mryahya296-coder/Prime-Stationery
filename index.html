@@ -101,20 +101,38 @@
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     padding:13px 28px;border-radius:999px;border:2px solid var(--ink);
     font-size:0.86rem;font-weight:600;letter-spacing:.02em;text-decoration:none;
-    transition:transform .15s ease, background .15s ease, color .15s ease;
+    transition:transform .12s ease, background .15s ease, color .15s ease, box-shadow .12s ease;
   }
-  .btn-primary{background:var(--berry);border-color:var(--berry);color:#fff;}
+  .btn-primary{background:var(--berry);border-color:var(--berry);color:#fff;box-shadow:0 5px 0 var(--berry-dark);}
   .btn-primary:hover{background:var(--berry-dark);border-color:var(--berry-dark);}
-  .btn-ghost{background:transparent;color:var(--ink);}
+  .btn-primary:active{transform:translateY(3px);box-shadow:0 2px 0 var(--berry-dark);}
+  .btn-ghost{background:transparent;color:var(--ink);box-shadow:0 5px 0 var(--ink);}
   .btn-ghost:hover{background:var(--ink);color:var(--paper);}
+  .btn-ghost:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink);}
   .btn-sm{padding:8px 16px;font-size:0.76rem;}
-  .btn:active{transform:scale(.97);}
+  .btn:active{transform:scale(.97) translateY(3px);}
   .btn[disabled]{opacity:.5;cursor:not-allowed;}
   .btn-block{width:100%;}
   .btn-danger{border-color:var(--berry);color:var(--berry);background:transparent;}
   .btn-danger:hover{background:var(--berry);color:#fff;}
 
-  .hero-visual{position:relative;aspect-ratio:1/1.05;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .hero-grid{perspective:1600px;}
+  .hero-visual{
+    position:relative;aspect-ratio:1/1.05;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 30px 50px -18px rgba(33,38,31,0.35);overflow:hidden;
+    transform-style:preserve-3d;will-change:transform;
+    transition:transform .35s cubic-bezier(.2,.9,.3,1);
+  }
+  .hero-visual svg{transform:translateZ(20px);}
+  .hero-float-tag{
+    position:absolute;top:-20px;right:-16px;width:76px;height:76px;border-radius:50%;
+    background:var(--brass);border:3px dashed rgba(33,38,31,0.3);color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-family:'Space Mono',monospace;font-weight:700;transform:translateZ(60px) rotate(-8deg);
+    box-shadow:0 14px 24px rgba(33,38,31,0.3);z-index:3;
+  }
+  .hero-float-tag span:first-child{font-size:0.6rem;}
+  .hero-float-tag span:last-child{font-size:0.82rem;line-height:1.1;text-align:center;}
   .hero-visual svg{width:100%;height:100%;}
   #ink-path{fill:none;stroke:var(--navy);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1400;stroke-dashoffset:1400;}
   #ink-dot{fill:var(--berry);}
@@ -122,6 +140,23 @@
 
   /* ---------- STRIP ---------- */
   .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:14px;background:var(--paper-dark);}
+
+  /* ---------- AD SLOTS ---------- */
+  .ad-slot{
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;
+    background:var(--card);border:2px dashed var(--line);border-radius:var(--radius);
+    color:var(--ink-soft);text-align:center;margin-block:0;position:relative;overflow:hidden;
+  }
+  .ad-slot .ad-label{
+    position:absolute;top:8px;left:10px;font-family:'Space Mono',monospace;font-size:0.6rem;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);opacity:0.7;
+  }
+  .ad-slot .ad-placeholder-text{font-size:0.8rem;color:var(--ink-soft);}
+  .ad-slot .ad-size{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--line);}
+  .ad-slot--leaderboard{width:100%;min-height:90px;max-width:728px;margin-inline:auto;}
+  .ad-slot--rectangle{width:100%;max-width:300px;min-height:250px;margin-inline:auto;}
+  .ad-slot--footer{width:100%;min-height:90px;max-width:970px;margin-inline:auto;}
+  @media (max-width:520px){ .ad-slot--leaderboard, .ad-slot--footer{min-height:100px;} }
   .strip-row{display:flex;gap:40px;overflow-x:auto;font-family:'Space Mono',monospace;font-size:0.74rem;letter-spacing:.06em;color:var(--ink-soft);text-transform:uppercase;}
   .strip-row span{white-space:nowrap;}
 
@@ -133,38 +168,53 @@
   .section-sub{color:var(--ink-soft);max-width:50ch;margin-top:8px;font-size:0.95rem;}
 
   /* ---------- PRODUCT GRID ---------- */
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;perspective:1400px;}
   @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:520px){ .grid{grid-template-columns:1fr;} }
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;position:relative;transition:transform .18s ease, box-shadow .18s ease;overflow:visible;}
-  .card:hover{transform:translateY(-4px) rotate(-0.4deg);box-shadow:var(--shadow);}
-  .card-media{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:var(--paper-dark);border-radius:var(--radius) var(--radius) 0 0;position:relative;overflow:hidden;}
-  .card-media svg{width:52%;height:52%;}
-  .tag{position:absolute;top:12px;left:-6px;background:var(--navy);color:#fff;font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:.06em;padding:5px 10px;border-radius:0 4px 4px 0;text-transform:uppercase;box-shadow:0 2px 4px rgba(0,0,0,.15);}
-  /* signature: circular price sticker, stuck on like a real mart price tag */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    display:flex;flex-direction:column;position:relative;overflow:visible;
+    transform-style:preserve-3d;will-change:transform;
+    transition:transform .35s cubic-bezier(.2,.9,.3,1), box-shadow .35s ease;
+    box-shadow:0 2px 6px rgba(33,38,31,0.06);
+  }
+  .card:hover{box-shadow:0 22px 34px -12px rgba(33,38,31,0.30);}
+  .card-media{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:var(--paper-dark);border-radius:var(--radius) var(--radius) 0 0;position:relative;overflow:hidden;transform:translateZ(18px);}
+  .card-media svg{width:52%;height:52%;filter:drop-shadow(0 6px 6px rgba(33,38,31,0.12));}
+  .tag{position:absolute;top:12px;left:-6px;background:var(--navy);color:#fff;font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:.06em;padding:5px 10px;border-radius:0 4px 4px 0;text-transform:uppercase;box-shadow:0 2px 4px rgba(0,0,0,.15);transform:translateZ(28px);}
+  /* signature: circular price sticker, layered so it looks physically stacked on the card */
   .price-tag{
     position:absolute;top:-14px;right:14px;width:56px;height:56px;border-radius:50%;
     background:var(--brass);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;
-    transform:rotate(-9deg);box-shadow:0 4px 10px rgba(33,38,31,0.22);
+    transform:translateZ(40px) rotate(-9deg);box-shadow:0 8px 16px rgba(33,38,31,0.28);
     border:2px dashed rgba(33,38,31,0.3);
     font-family:'Space Mono',monospace;font-weight:700;line-height:1;z-index:2;
   }
+  .price-tag::before{
+    content:'';position:absolute;inset:0;border-radius:50%;
+    background:var(--brass);opacity:0.55;
+    transform:translateZ(-10px) rotate(9deg) scale(0.94);
+    z-index:-1;
+  }
   .price-tag .cur{font-size:0.55rem;}
   .price-tag .amt{font-size:0.92rem;}
-  .card-body{padding:18px 16px 18px;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .card-body{padding:18px 16px 18px;display:flex;flex-direction:column;gap:6px;flex:1;transform:translateZ(10px);}
   .card-body .cat{font-family:'Space Mono',monospace;font-size:0.66rem;letter-spacing:.08em;color:var(--navy);text-transform:uppercase;}
   .card-body h3{font-size:1.02rem;line-height:1.25;text-transform:none;font-family:'Public Sans',sans-serif;font-weight:700;}
   .card-body .desc{font-size:0.82rem;color:var(--ink-soft);line-height:1.45;flex:1;}
   .card-foot{margin-top:10px;}
-  .add-btn{background:var(--ink);color:var(--paper);border:none;width:100%;padding:10px 14px;font-size:0.8rem;font-weight:600;letter-spacing:.02em;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .add-btn{background:var(--ink);color:var(--paper);border:none;width:100%;padding:10px 14px;font-size:0.8rem;font-weight:600;letter-spacing:.02em;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;transform:translateZ(24px);transition:transform .12s ease, background .15s ease;}
   .add-btn:hover{background:var(--berry);}
+  .add-btn:active{transform:translateZ(24px) scale(.96);}
   .add-btn.added{background:var(--navy);}
 
   /* ---------- FEEDBACKS ---------- */
   .feedback-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
   @media (max-width:900px){ .feedback-grid{grid-template-columns:1fr 1fr;} }
   @media (max-width:600px){ .feedback-grid{grid-template-columns:1fr;} }
-  .feedback-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:12px;position:relative;}
+  .feedback-grid{perspective:1400px;}
+  .feedback-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:12px;position:relative;transform-style:preserve-3d;will-change:transform;transition:transform .35s cubic-bezier(.2,.9,.3,1), box-shadow .35s ease;box-shadow:0 2px 6px rgba(33,38,31,0.06);}
+  .feedback-card:hover{box-shadow:0 20px 30px -12px rgba(33,38,31,0.26);}
   .stars{color:var(--brass);font-size:0.9rem;letter-spacing:2px;}
   .feedback-text{font-size:0.92rem;color:var(--ink);line-height:1.55;flex:1;}
   .feedback-who{display:flex;align-items:center;gap:10px;margin-top:4px;}
@@ -313,6 +363,7 @@
         </div>
       </div>
       <div class="hero-visual" id="hero-visual">
+        <div class="hero-float-tag"><span>DEALS</span><span>up to<br>30% off</span></div>
         <svg viewBox="0 0 400 420" preserveAspectRatio="xMidYMid meet">
           <rect x="0" y="0" width="400" height="420" fill="var(--card)"/>
           <g stroke="var(--line)" stroke-width="1">
@@ -334,6 +385,14 @@
     <div class="wrap strip-row" id="strip-row"></div>
   </div>
 
+  <div class="wrap" style="padding-block:24px;">
+    <div class="ad-slot ad-slot--leaderboard">
+      <span class="ad-label">Advertisement</span>
+      <span class="ad-placeholder-text">Ad space — replace with your ad network's embed code (e.g. Google AdSense)</span>
+      <span class="ad-size">728 × 90</span>
+    </div>
+  </div>
+
   <!-- SHOP -->
   <section class="section" id="shop">
     <div class="wrap">
@@ -347,6 +406,14 @@
       <div class="grid" id="product-grid"></div>
     </div>
   </section>
+
+  <div class="wrap" style="padding-block:0 24px;">
+    <div class="ad-slot ad-slot--rectangle">
+      <span class="ad-label">Advertisement</span>
+      <span class="ad-placeholder-text">Ad space — replace with your ad network's embed code</span>
+      <span class="ad-size">300 × 250</span>
+    </div>
+  </div>
 
   <!-- FEEDBACK -->
   <section class="section" id="feedback" style="padding-top:0;">
@@ -378,6 +445,13 @@
 </main>
 
 <footer>
+  <div class="wrap" style="padding-bottom:24px;">
+    <div class="ad-slot ad-slot--footer">
+      <span class="ad-label">Advertisement</span>
+      <span class="ad-placeholder-text">Ad space — replace with your ad network's embed code</span>
+      <span class="ad-size">970 × 90 (or 728 × 90 on smaller screens)</span>
+    </div>
+  </div>
   <div class="wrap foot-row">
     <span id="txt-footer"></span>
     <button class="admin-link" id="admin-link">Admin</button>
@@ -783,6 +857,7 @@
         </div>
       </div>
     `;}).join('');
+    applyTilt(grid.querySelectorAll('.card'), 14);
   }
 
   grid.addEventListener('click', e=>{
@@ -799,7 +874,8 @@
 
   /* ---------------- RENDER: FEEDBACKS ---------------- */
   function renderFeedbacks(){
-    document.getElementById('feedback-grid').innerHTML = feedbacks.map(f=>`
+    const feedbackGrid = document.getElementById('feedback-grid');
+    feedbackGrid.innerHTML = feedbacks.map(f=>`
       <div class="feedback-card">
         <span class="stars">${'★'.repeat(f.rating)}${'☆'.repeat(5-f.rating)}</span>
         <p class="feedback-text">"${escapeHtml(f.text)}"</p>
@@ -812,6 +888,24 @@
         </div>
       </div>
     `).join('');
+    applyTilt(feedbackGrid.querySelectorAll('.feedback-card'), 8);
+  }
+
+  /* ---------------- 3D TILT (cards + hero) ---------------- */
+  const prefersReducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function applyTilt(elements, maxDeg){
+    if(prefersReducedMotionQuery.matches) return;
+    elements.forEach(el=>{
+      el.addEventListener('mousemove', e=>{
+        const rect = el.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;   // 0..1
+        const py = (e.clientY - rect.top) / rect.height;   // 0..1
+        const rotateY = (px - 0.5) * maxDeg * 2;
+        const rotateX = (0.5 - py) * maxDeg * 2;
+        el.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+      });
+      el.addEventListener('mouseleave', ()=>{ el.style.transform = ''; });
+    });
   }
 
   /* ---------------- CART DRAWER ---------------- */
@@ -1074,6 +1168,7 @@
   }
   window.addEventListener('scroll', updateInk, {passive:true});
   window.addEventListener('resize', updateInk);
+  applyTilt([heroVisual], 10);
 
   /* ================= ADMIN ================= */
   const adminLoginOverlay = document.getElementById('admin-login-overlay');
