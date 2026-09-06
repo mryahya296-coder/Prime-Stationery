@@ -303,6 +303,28 @@
   .receipt-total{display:flex;justify-content:space-between;padding:14px 18px;font-family:'Space Mono',monospace;border-top:1px solid var(--line);font-size:1rem;}
 
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:8px;font-size:0.85rem;z-index:95;opacity:0;pointer-events:none;transition:all .25s ease;}
+
+  /* ---------------- NOTEPAD ---------------- */
+  .notepad-fab{
+    position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;
+    background:var(--navy);color:#fff;border:none;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 22px rgba(33,38,31,0.3);z-index:55;transition:transform .15s ease, background .15s ease;
+  }
+  .notepad-fab svg{width:24px;height:24px;}
+  .notepad-fab:hover{background:var(--berry);transform:translateY(-2px);}
+  .notepad-fab:active{transform:translateY(1px);}
+  @media (max-width:640px){ .notepad-fab{right:16px;bottom:16px;width:50px;height:50px;} }
+
+  .notepad-textarea{
+    width:100%;min-height:110px;border:1px solid var(--line);border-radius:8px;padding:12px;
+    font-family:'Public Sans',sans-serif;font-size:0.92rem;background:var(--paper);color:var(--ink);resize:vertical;
+  }
+  .notepad-textarea:focus{outline:2px solid var(--navy);outline-offset:1px;}
+  .notepad-canvas-wrap{
+    border:2px dashed var(--line);border-radius:var(--radius);background:#fff;overflow:hidden;
+  }
+  #notepad-canvas{display:block;width:100%;height:260px;touch-action:none;cursor:crosshair;}
+  .notepad-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .disclaimer{font-size:0.72rem;color:var(--ink-soft);margin-top:16px;line-height:1.5;border-top:1px dashed var(--line);padding-top:12px;}
 
@@ -661,6 +683,37 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- NOTEPAD -->
+<button class="notepad-fab" id="notepad-fab" aria-label="Open notepad">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9" stroke-linecap="round"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<div class="modal-overlay" id="notepad-overlay">
+  <div class="modal">
+    <div class="modal-head"><h2>Notepad</h2><button class="modal-close" id="notepad-close">&times;</button></div>
+    <div class="modal-body">
+      <div class="field">
+        <label for="notepad-text">Write a note</label>
+        <textarea id="notepad-text" class="notepad-textarea" placeholder="Jot something down — a gift idea, a question for the store, anything."></textarea>
+      </div>
+      <div class="notepad-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="notepad-clear-text">Erase text</button>
+      </div>
+
+      <div class="admin-sub" style="margin-top:24px;">Or draw something</div>
+      <div class="notepad-canvas-wrap">
+        <canvas id="notepad-canvas"></canvas>
+      </div>
+      <div class="notepad-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="notepad-clear-canvas">Erase drawing</button>
+        <button type="button" class="btn btn-danger btn-sm" id="notepad-clear-all">Clear everything</button>
+      </div>
+
+      <p class="disclaimer">This notepad is private to you and lives only in this browser tab — it isn't saved to any account or database, and clears when you close or reload the page.</p>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -1429,6 +1482,86 @@
       showToast('Reset locally, but saving to Supabase failed');
     }
     adminOverlay.classList.remove('open');
+  });
+
+  /* ================= NOTEPAD ================= */
+  const notepadFab = document.getElementById('notepad-fab');
+  const notepadOverlay = document.getElementById('notepad-overlay');
+  const notepadClose = document.getElementById('notepad-close');
+  const notepadText = document.getElementById('notepad-text');
+  const notepadCanvas = document.getElementById('notepad-canvas');
+  const notepadCtx = notepadCanvas.getContext('2d');
+  let notepadCanvasReady = false;
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+
+  function sizeNotepadCanvas(){
+    const rect = notepadCanvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    // preserve existing drawing across a resize by copying pixels
+    const prev = notepadCanvasReady ? notepadCtx.getImageData(0, 0, notepadCanvas.width, notepadCanvas.height) : null;
+    notepadCanvas.width = Math.max(1, Math.round(rect.width * dpr));
+    notepadCanvas.height = Math.max(1, Math.round(rect.height * dpr));
+    notepadCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    notepadCtx.lineCap = 'round';
+    notepadCtx.lineJoin = 'round';
+    notepadCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink') || '#21261F';
+    notepadCtx.lineWidth = 2.4;
+    if(prev){ notepadCtx.putImageData(prev, 0, 0); }
+    notepadCanvasReady = true;
+  }
+
+  function notepadPos(e){
+    const rect = notepadCanvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  notepadCanvas.addEventListener('pointerdown', e=>{
+    drawing = true;
+    const p = notepadPos(e);
+    lastX = p.x; lastY = p.y;
+    notepadCanvas.setPointerCapture(e.pointerId);
+  });
+  notepadCanvas.addEventListener('pointermove', e=>{
+    if(!drawing) return;
+    const p = notepadPos(e);
+    notepadCtx.beginPath();
+    notepadCtx.moveTo(lastX, lastY);
+    notepadCtx.lineTo(p.x, p.y);
+    notepadCtx.stroke();
+    lastX = p.x; lastY = p.y;
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(evt=>{
+    notepadCanvas.addEventListener(evt, ()=>{ drawing = false; });
+  });
+
+  function openNotepad(){
+    notepadOverlay.classList.add('open');
+    // canvas has zero size until the modal is visible, so size it next frame
+    requestAnimationFrame(sizeNotepadCanvas);
+  }
+  function closeNotepad(){ notepadOverlay.classList.remove('open'); }
+
+  notepadFab.addEventListener('click', openNotepad);
+  notepadClose.addEventListener('click', closeNotepad);
+
+  document.getElementById('notepad-clear-text').addEventListener('click', ()=>{
+    notepadText.value = '';
+  });
+  document.getElementById('notepad-clear-canvas').addEventListener('click', ()=>{
+    notepadCtx.clearRect(0, 0, notepadCanvas.width, notepadCanvas.height);
+  });
+  document.getElementById('notepad-clear-all').addEventListener('click', ()=>{
+    notepadText.value = '';
+    notepadCtx.clearRect(0, 0, notepadCanvas.width, notepadCanvas.height);
+    showToast('Notepad cleared');
+  });
+
+  let notepadResizeTimer;
+  window.addEventListener('resize', ()=>{
+    if(!notepadOverlay.classList.contains('open')) return;
+    clearTimeout(notepadResizeTimer);
+    notepadResizeTimer = setTimeout(sizeNotepadCanvas, 200);
   });
 
   /* ---------------- INIT ---------------- */
