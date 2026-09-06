@@ -346,6 +346,10 @@
   @media (max-width:520px){ .admin-grid-2{grid-template-columns:1fr;} }
   .admin-save-bar{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--line);padding:16px 0 4px;margin-top:20px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
   .admin-note{font-size:0.76rem;color:var(--ink-soft);background:var(--card);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;margin-bottom:20px;line-height:1.5;}
+  .ad-admin-preview{margin-bottom:12px;}
+  .ad-admin-preview img{max-width:220px;max-height:110px;border:1px solid var(--line);border-radius:8px;display:block;object-fit:cover;}
+  .ad-admin-preview .ad-admin-empty{font-size:0.78rem;color:var(--ink-soft);font-style:italic;}
+  .ad-admin-preview .ad-admin-uploading{font-size:0.78rem;color:var(--navy);}
   .rating-stars{display:flex;gap:4px;}
   .rating-stars button{background:none;border:none;font-size:1.2rem;color:var(--line);padding:0;}
   .rating-stars button.on{color:var(--brass);}
@@ -407,12 +411,8 @@
     <div class="wrap strip-row" id="strip-row"></div>
   </div>
 
-  <div class="wrap" style="padding-block:24px;">
-    <div class="ad-slot ad-slot--leaderboard">
-      <span class="ad-label">Advertisement</span>
-      <span class="ad-placeholder-text">Ad space — replace with your ad network's embed code (e.g. Google AdSense)</span>
-      <span class="ad-size">728 × 90</span>
-    </div>
+  <div class="wrap" style="padding-block:24px;" id="ad-leaderboard-wrap">
+    <div class="ad-slot ad-slot--leaderboard" id="ad-leaderboard"></div>
   </div>
 
   <!-- SHOP -->
@@ -429,12 +429,8 @@
     </div>
   </section>
 
-  <div class="wrap" style="padding-block:0 24px;">
-    <div class="ad-slot ad-slot--rectangle">
-      <span class="ad-label">Advertisement</span>
-      <span class="ad-placeholder-text">Ad space — replace with your ad network's embed code</span>
-      <span class="ad-size">300 × 250</span>
-    </div>
+  <div class="wrap" style="padding-block:0 24px;" id="ad-rectangle-wrap">
+    <div class="ad-slot ad-slot--rectangle" id="ad-rectangle"></div>
   </div>
 
   <!-- FEEDBACK -->
@@ -467,12 +463,8 @@
 </main>
 
 <footer>
-  <div class="wrap" style="padding-bottom:24px;">
-    <div class="ad-slot ad-slot--footer">
-      <span class="ad-label">Advertisement</span>
-      <span class="ad-placeholder-text">Ad space — replace with your ad network's embed code</span>
-      <span class="ad-size">970 × 90 (or 728 × 90 on smaller screens)</span>
-    </div>
+  <div class="wrap" style="padding-bottom:24px;" id="ad-footer-wrap">
+    <div class="ad-slot ad-slot--footer" id="ad-footer"></div>
   </div>
   <div class="wrap foot-row">
     <span id="txt-footer"></span>
@@ -621,6 +613,7 @@
         <button class="admin-tab active" data-tab="banner">Banner &amp; Text</button>
         <button class="admin-tab" data-tab="products">Products</button>
         <button class="admin-tab" data-tab="feedbacks">Feedback</button>
+        <button class="admin-tab" data-tab="ads">Ads</button>
       </div>
 
       <!-- BANNER & TEXT PANE -->
@@ -670,6 +663,53 @@
         <div class="admin-sub">Customer feedback</div>
         <div id="a-feedback-list"></div>
         <button class="btn btn-ghost btn-sm" id="a-add-feedback" type="button">+ Add feedback</button>
+      </div>
+
+      <!-- ADS PANE -->
+      <div class="admin-pane" id="pane-ads">
+        <p class="admin-note">Upload a picture for any slot, or paste an image URL. Add an optional link so clicking the ad takes visitors somewhere. Leave the image empty to show the placeholder box. Turning a slot off hides it completely, including its spacing.</p>
+
+        <div class="admin-sub">Leaderboard — below the hero (728 × 90)</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;margin-bottom:10px;">
+          <input type="checkbox" id="a-ad-leaderboard-enabled"> Show this ad slot
+        </label>
+        <div id="a-ad-leaderboard-preview" class="ad-admin-preview"></div>
+        <div class="admin-grid-2">
+          <div class="field"><label>Upload picture</label><input type="file" accept="image/*" id="a-ad-leaderboard-file"></div>
+          <div class="field"><label>Or paste an image URL</label><input type="text" id="a-ad-leaderboard-url" placeholder="https://..."></div>
+        </div>
+        <div class="admin-grid-2" style="margin-bottom:0;">
+          <div class="field" style="margin-bottom:0;"><label>Link (optional)</label><input type="text" id="a-ad-leaderboard-link" placeholder="https://..."></div>
+          <div class="field" style="margin-bottom:0;"><label>Alt text</label><input type="text" id="a-ad-leaderboard-alt" placeholder="Describe the ad image"></div>
+        </div>
+
+        <div class="admin-sub">Rectangle — between Shop and Feedback (300 × 250)</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;margin-bottom:10px;">
+          <input type="checkbox" id="a-ad-rectangle-enabled"> Show this ad slot
+        </label>
+        <div id="a-ad-rectangle-preview" class="ad-admin-preview"></div>
+        <div class="admin-grid-2">
+          <div class="field"><label>Upload picture</label><input type="file" accept="image/*" id="a-ad-rectangle-file"></div>
+          <div class="field"><label>Or paste an image URL</label><input type="text" id="a-ad-rectangle-url" placeholder="https://..."></div>
+        </div>
+        <div class="admin-grid-2" style="margin-bottom:0;">
+          <div class="field" style="margin-bottom:0;"><label>Link (optional)</label><input type="text" id="a-ad-rectangle-link" placeholder="https://..."></div>
+          <div class="field" style="margin-bottom:0;"><label>Alt text</label><input type="text" id="a-ad-rectangle-alt" placeholder="Describe the ad image"></div>
+        </div>
+
+        <div class="admin-sub">Footer banner (970 × 90)</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;margin-bottom:10px;">
+          <input type="checkbox" id="a-ad-footer-enabled"> Show this ad slot
+        </label>
+        <div id="a-ad-footer-preview" class="ad-admin-preview"></div>
+        <div class="admin-grid-2">
+          <div class="field"><label>Upload picture</label><input type="file" accept="image/*" id="a-ad-footer-file"></div>
+          <div class="field"><label>Or paste an image URL</label><input type="text" id="a-ad-footer-url" placeholder="https://..."></div>
+        </div>
+        <div class="admin-grid-2" style="margin-bottom:0;">
+          <div class="field" style="margin-bottom:0;"><label>Link (optional)</label><input type="text" id="a-ad-footer-link" placeholder="https://..."></div>
+          <div class="field" style="margin-bottom:0;"><label>Alt text</label><input type="text" id="a-ad-footer-alt" placeholder="Describe the ad image"></div>
+        </div>
       </div>
 
       <div class="admin-save-bar">
@@ -758,7 +798,12 @@
       { title:'Check out', text:'Enter shipping details and choose card or cash on delivery. Everything is validated before it can be placed.' },
       { title:'Order received', text:'You get an order number and a receipt on screen immediately — the same summary a fulfilment team would work from.' }
     ],
-    footer: '© 2026 YY Marts — a demo storefront.'
+    footer: '© 2026 YY Marts — a demo storefront.',
+    ads: {
+      leaderboard: { enabled: true, imageUrl: '', linkUrl: '', altText: '' },
+      rectangle: { enabled: true, imageUrl: '', linkUrl: '', altText: '' },
+      footer: { enabled: true, imageUrl: '', linkUrl: '', altText: '' }
+    }
   };
 
   const defaultProducts = [
@@ -879,12 +924,51 @@
         <h3>${escapeHtml(s.title)}</h3>
         <p>${escapeHtml(s.text)}</p>
       </div>`).join('');
+
+    renderAds();
   }
 
   function escapeHtml(str){
     const d = document.createElement('div');
     d.textContent = str;
     return d.innerHTML;
+  }
+
+  const AD_META = {
+    leaderboard: { label: 'Advertisement', size: '728 × 90' },
+    rectangle: { label: 'Advertisement', size: '300 × 250' },
+    footer: { label: 'Advertisement', size: '970 × 90 (or 728 × 90 on smaller screens)' }
+  };
+
+  function renderAds(){
+    const ads = siteContent.ads || {};
+    Object.keys(AD_META).forEach(key=>{
+      const wrap = document.getElementById('ad-'+key+'-wrap');
+      const container = document.getElementById('ad-'+key);
+      if(!wrap || !container) return;
+      const conf = ads[key] || { enabled:true, imageUrl:'', linkUrl:'', altText:'' };
+
+      if(!conf.enabled){
+        wrap.style.display = 'none';
+        container.innerHTML = '';
+        return;
+      }
+      wrap.style.display = '';
+
+      if(conf.imageUrl && conf.imageUrl.trim()){
+        const img = `<img src="${escapeAttr(conf.imageUrl)}" alt="${escapeAttr(conf.altText || 'Advertisement')}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+        container.innerHTML = conf.linkUrl && conf.linkUrl.trim()
+          ? `<a href="${escapeAttr(conf.linkUrl)}" target="_blank" rel="noopener sponsored" style="display:block;width:100%;height:100%;">${img}</a>`
+          : img;
+      } else {
+        const meta = AD_META[key];
+        container.innerHTML = `
+          <span class="ad-label">${escapeHtml(meta.label)}</span>
+          <span class="ad-placeholder-text">Ad space — add a picture from the admin panel</span>
+          <span class="ad-size">${escapeHtml(meta.size)}</span>
+        `;
+      }
+    });
   }
 
   /* ---------------- RENDER: PRODUCTS ---------------- */
@@ -1273,9 +1357,13 @@
 
   function openAdminPanel(){
     draftContent = JSON.parse(JSON.stringify(siteContent));
+    if(!draftContent.ads){
+      draftContent.ads = JSON.parse(JSON.stringify(defaultContent.ads));
+    }
     draftProducts = JSON.parse(JSON.stringify(products));
     draftFeedbacks = JSON.parse(JSON.stringify(feedbacks));
     fillAdminBannerForm();
+    fillAdminAdsForm();
     renderAdminProducts();
     renderAdminFeedbacks();
     adminOverlay.classList.add('open');
@@ -1306,6 +1394,68 @@
     document.getElementById('a-process-sub').value = draftContent.processSub;
     document.getElementById('a-footer').value = draftContent.footer;
     renderAdminSteps();
+  }
+
+  function renderAdAdminPreview(key){
+    const conf = draftContent.ads[key];
+    const previewEl = document.getElementById('a-ad-'+key+'-preview');
+    if(conf.imageUrl && conf.imageUrl.trim()){
+      previewEl.innerHTML = `<img src="${escapeAttr(conf.imageUrl)}" alt="">`;
+    } else {
+      previewEl.innerHTML = `<span class="ad-admin-empty">No picture set yet — showing placeholder on the live site.</span>`;
+    }
+  }
+
+  function fillAdminAdsForm(){
+    ['leaderboard','rectangle','footer'].forEach(key=>{
+      if(!draftContent.ads[key]){
+        draftContent.ads[key] = { enabled:true, imageUrl:'', linkUrl:'', altText:'' };
+      }
+      const conf = draftContent.ads[key];
+      const enabledEl = document.getElementById('a-ad-'+key+'-enabled');
+      const urlEl = document.getElementById('a-ad-'+key+'-url');
+      const linkEl = document.getElementById('a-ad-'+key+'-link');
+      const altEl = document.getElementById('a-ad-'+key+'-alt');
+      const fileEl = document.getElementById('a-ad-'+key+'-file');
+      const previewEl = document.getElementById('a-ad-'+key+'-preview');
+
+      enabledEl.checked = conf.enabled !== false;
+      urlEl.value = conf.imageUrl || '';
+      linkEl.value = conf.linkUrl || '';
+      altEl.value = conf.altText || '';
+      fileEl.value = '';
+      renderAdAdminPreview(key);
+
+      enabledEl.onchange = ()=>{ draftContent.ads[key].enabled = enabledEl.checked; };
+      urlEl.oninput = ()=>{ draftContent.ads[key].imageUrl = urlEl.value; renderAdAdminPreview(key); };
+      linkEl.oninput = ()=>{ draftContent.ads[key].linkUrl = linkEl.value; };
+      altEl.oninput = ()=>{ draftContent.ads[key].altText = altEl.value; };
+
+      fileEl.onchange = async ()=>{
+        const file = fileEl.files[0];
+        if(!file) return;
+        if(!supabaseConfigured){
+          showToast('Supabase not configured — can\'t upload images');
+          return;
+        }
+        previewEl.innerHTML = `<span class="ad-admin-uploading">Uploading…</span>`;
+        try{
+          const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+          const path = `${key}-${Date.now()}.${ext}`;
+          const { error: uploadError } = await sb.storage.from('ad-images').upload(path, file, { upsert: true });
+          if(uploadError) throw uploadError;
+          const { data } = sb.storage.from('ad-images').getPublicUrl(path);
+          draftContent.ads[key].imageUrl = data.publicUrl;
+          urlEl.value = data.publicUrl;
+          renderAdAdminPreview(key);
+          showToast('Picture uploaded');
+        }catch(err){
+          console.error('ad image upload failed', err);
+          showToast('Upload failed: ' + (err.message || 'unknown error'));
+          renderAdAdminPreview(key);
+        }
+      };
+    });
   }
 
   function renderAdminSteps(){
